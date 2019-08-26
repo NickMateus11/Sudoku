@@ -1,0 +1,2 @@
+- Sudoku game made in Python
+- Includes AI to solve Sudoku grids
