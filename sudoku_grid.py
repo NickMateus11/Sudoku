@@ -1,6 +1,6 @@
 from math import sqrt
 class sud_grid():
-    def __init__(self, div=3, seperation=1):
+    def __init__(self, div=3, seperation=1, nums=[]):
         # TODO: check if div is int
         if div <= 0:
             print('Invalid dimensions')
@@ -13,7 +13,7 @@ class sud_grid():
             self.horizontal_spacing = (self.number_spacing + 1) * (self.div + 1) - 1
             print(f'{self.nums_per_line} x {self.nums_per_line} grid created!')
 
-            self.grid = iter([1,2,3,4,5,6,7,8,9]*80)
+            self.grid = iter(nums)
     
     def draw_grid(self):
         for _ in range(self.div):
@@ -36,8 +36,8 @@ class sud_grid():
             row += f'{" "*self.number_spacing}{insert_char}'
         return row
 
-s = sud_grid(2)
-s.draw_grid()
+# s = sud_grid(2)
+# s.draw_grid()
 """
 +-----------+---------+---------+
 |  1  2  3  |         |         |
