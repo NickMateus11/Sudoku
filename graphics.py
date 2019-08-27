@@ -18,7 +18,7 @@ class sud_grid():
         for _ in range(self.div):
             print(self.horizintal_seperator())
             for i in range(self.div*self.vertical_spacing):
-                print(self.inject_grid_row(blank_line=(i%self.vertical_spacing!=0)))
+                print(self.inject_grid_row(blank_line=(self.vertical_spacing>1 and i%self.vertical_spacing-1!=0))) # WIP
         print(self.horizintal_seperator())
 
     def horizintal_seperator(self):
