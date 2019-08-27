@@ -1,5 +1,5 @@
 class sud_grid():
-    def __init__(self, div=3, seperation=1, nums=[]):
+    def __init__(self, div=3, nums=[]):
         # TODO: check if div is int
         if div <= 0:
             print('Invalid dimensions')
@@ -7,7 +7,7 @@ class sud_grid():
         else:
             self.div = int(div)
             self.nums_per_line = self.div**2
-            self.vertical_spacing = seperation
+            self.vertical_spacing = 1
             self.number_spacing = self.vertical_spacing * 2
             self.horizontal_spacing = (self.number_spacing + 1) * (self.div + 1) - 1
             print(f'{self.nums_per_line} x {self.nums_per_line} grid created!')
@@ -18,16 +18,14 @@ class sud_grid():
         for _ in range(self.div):
             print(self.horizintal_seperator())
             for i in range(self.div*self.vertical_spacing):
-                print(self.inject_grid_row(blank_line=(self.vertical_spacing>1 and i%self.vertical_spacing-1!=0))) # WIP
+                print(self.inject_grid_row())
         print(self.horizintal_seperator())
 
     def horizintal_seperator(self):
         h_segment = f'+{"-"*self.horizontal_spacing}'*self.div + '+'
         return h_segment
     
-    def inject_grid_row(self, blank_line=False):
-        if blank_line:
-            return f'|{" "*(self.number_spacing*(self.div+1) + self.div)}' * (self.div+1)
+    def inject_grid_row(self):
         row = '|'
         for i in range(1, self.nums_per_line + self.div + 1):
             if i%(self.div+1) == 0:
