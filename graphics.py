@@ -17,7 +17,7 @@ class sud_grid():
     def draw_grid(self):
         for _ in range(self.div):
             print(self.horizintal_seperator())
-            for i in range(self.div*self.vertical_spacing):
+            for _ in range(self.div*self.vertical_spacing):
                 print(self.inject_grid_row())
         print(self.horizintal_seperator())
 
@@ -32,7 +32,6 @@ class sud_grid():
                 insert_char = '|'
             else:
                 insert_char = next(self.grid)
-
             row += f'{" "*self.number_spacing}{insert_char}'
         return row
 
