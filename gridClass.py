@@ -1,6 +1,6 @@
-import cell_group_class
+from cellGroupClass import CellGroup
 import math
-class grid:
+class Grid:
     def __init__(self, dim, init_vals=None):
         if dim <= 0:
             raise ValueError
@@ -21,7 +21,7 @@ class grid:
         pass
 
 a = [1,2,3,4,5,6,7,8,9] * 9
-g = grid(3, a)
+g = Grid(3, a)
 
 # a = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16] * 16
 # g = grid(4, a)

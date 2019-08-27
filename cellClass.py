@@ -1,4 +1,4 @@
-class cell:
+class Cell:
     def __init__(self, value=None):
         if value <= 0:
             raise ValueError
