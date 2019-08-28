@@ -1,6 +1,6 @@
 class Cell:
     def __init__(self, value=None):
-        if value <= 0:
+        if value is not None and value <= 0:
             raise ValueError
         self.value = value
         self.possible_vals = []
