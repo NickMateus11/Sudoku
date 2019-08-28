@@ -1,7 +1,7 @@
 import argparse
 
 
-def create_template_file(base_dim, filename): # names must match parser tags
+def create_template_file(base_dim, filename=None): # names must match parser tags
     if filename is None:
         filename = f'example_{base_dim}x{base_dim}.txt'
     with open(filename, 'w') as new_file:
