@@ -9,3 +9,6 @@ pool = list(range(1, dim+1)) + [None]*dim
 a = [pool[random.randint(0,len(pool)-1)] for _ in range(base_dim**4)]
 g = Board(a)
 g.draw_board()
+
+def create_sudoku_from_file(filename):
+    print(filename)
