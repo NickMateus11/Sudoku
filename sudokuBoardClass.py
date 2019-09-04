@@ -52,7 +52,7 @@ class Board:
         rows = int(len(lin_cells) ** 0.5)
         for i in range(rows):
             row = lin_cells[i*rows : i*rows+rows]
-            if not Board.check_rules_against_list(row):
+            if Board.check_rule_violation(row):
                 return False
         return True
 
@@ -61,20 +61,31 @@ class Board:
         cols = int(len(lin_cells) ** 0.5)
         for i in range(cols):
             col = [lin_cells[row*cols + i] for row in range(cols)]
-            if not Board.check_rules_against_list(col):
+            if Board.check_rule_violation(col):
                 return False
         return True
 
     @staticmethod
     def check_groups(lin_cells):
+        nums_per_group = int(len(lin_cells) ** 0.5)
+        group_width = int(nums_per_group ** 0.5)
+        group_row_offset = group_width ** 3
+        for row in range(group_width): # row of groups
+            for col in range(group_width): # each group per row
+                group_list = []
+                for i in range(nums_per_group): # individual group
+                    index = (group_row_offset * row) + (group_width * col) + i%group_width + (i//group_width)*nums_per_group
+                    group_list.append(lin_cells[index]) 
+                if Board.check_rule_violation(group_list):
+                    return False
         return True
 
     @staticmethod
-    def check_rules_against_list(val_list): # no violations are present
+    def check_rule_violation(val_list): # no violations are present
         track_dict = {val: val_list.count(val) for val in range(1,len(val_list)+1)}
         return reduce(
-            lambda a,b: a and b, 
-            [count <= 1 for count in track_dict.values()]
+            lambda a,b: a or b, 
+            [count > 1 for count in track_dict.values()]
         )
 
 Board.check_cols([
@@ -83,10 +94,12 @@ Board.check_cols([
     3,4,1,2,
     4,3,2,1])
 Board.check_rows([1,2,3,4,1,2,3,4,1,2,3,4,1,2,3,4])
-Board.check_groups([
-    1,2,1,3,
-    3,4,2,4,
-    3,4,1,3,
-    1,2,4,2])
+print(Board.check_groups([
+    1,2, 1,3,
+    3,4, 2,4,
 
-Board.check_rules_against_list([1,2,3,4,5])
+    3,4, 1,3,
+    1,2, 4,2
+]))
+
+Board.check_rule_violation([1,2,3,4,5])
