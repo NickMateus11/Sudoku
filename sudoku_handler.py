@@ -12,8 +12,10 @@ def create_sudoku_from_file(filename):
         linearized_list += [(int(val) if val is not '*' else None) for val in stripped_line]
     return Board(linearized_list) # TODO: validation?
     
-g1 = create_sudoku_from_file('example_3x3.txt')
-g1.draw_board()
+def solve(board):
+    while(Board.is_valid_board(board)):
+        return True
 
-g1 = create_sudoku_from_file('example_2x2.txt')
-g1.draw_board()
+sudoku_file = 'example_3x3.txt'
+s = create_sudoku_from_file(sudoku_file)
+s.update_possible_cell_vals()

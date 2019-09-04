@@ -8,13 +8,33 @@ class Board:
             raise ValueError
         self.nums_per_line = int(math.sqrt(len(init_vals)))
         self.base_dim = int(math.sqrt(self.nums_per_line))
-        self.cells = [Cell(val) for val in init_vals]
         self.number_spacing = 2 if expand else 1
         self.horizontal_spacing = (self.number_spacing + 1) * (self.base_dim + 1) - 1
 
-    def get_cell_vals_list(self):
-        return [cell.value for cell in self.cells]
+        self.cells = [Cell(val) for val in init_vals]
+        self.populate_possible_cell_vals()
 
+    def get_cell_vals_list(self):
+        return [cell.val for cell in self.cells]
+
+    def populate_possible_cell_vals(self):
+        for cell in self.cells:
+            if len(cell.possible_vals) is 0:
+                cell.possible_vals = list(range(1,self.nums_per_line+1))
+
+    def update_possible_cell_vals(self):
+        for i in range(len(self.cells)):
+            curr_cell = self.cells[i]
+            if curr_cell.val is not None:
+                continue
+            temp_list = self.get_cell_vals_list()
+            for val in curr_cell.possible_vals:
+                temp_list[i] = val
+                if not Board.is_valid_board(temp_list):
+                    curr_cell.possible_vals.remove(val)
+        print([c.possible_vals for c in self.cells])
+
+    # ----- Drawing ----- #
     def draw_board(self):
         iter_cells = iter(self.get_cell_vals_list())
         self.h_segment = f'+{"-"*self.horizontal_spacing}'*self.base_dim + '+'
@@ -35,7 +55,9 @@ class Board:
                     insert_char = ' '
             row += f'{" "*self.number_spacing}{insert_char}'
         return row
+    # ----- \Drawing ----- #
 
+    # ----- Static methods ----- #
     @staticmethod
     def is_valid_board(lin_cells):
         len_lin_cells = len(lin_cells)**0.25
@@ -85,3 +107,4 @@ class Board:
             lambda a,b: a or b, 
             [count is None or count > 1 for count in track_dict.values()]
         )
+    # ----- \Static methods ----- #
