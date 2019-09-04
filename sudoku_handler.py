@@ -10,7 +10,7 @@ def create_sudoku_from_file(filename):
     for i in range(len(contents)):
         stripped_line = contents[i].strip().replace(' ', '')
         linearized_list += [(int(val) if val is not '*' else None) for val in stripped_line]
-    return Board(linearized_list) # TODO: validation?
+    return Board(linearized_list)
     
 def solve(board):
     while(Board.is_valid_board(board)):
@@ -18,4 +18,6 @@ def solve(board):
 
 sudoku_file = 'example_3x3.txt'
 s = create_sudoku_from_file(sudoku_file)
-s.update_possible_cell_vals()
+# print([cell.possible_vals for cell in s.cells])
+# print(s.is_win_state())
+# print(s.is_stalemate())

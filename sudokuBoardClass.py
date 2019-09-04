@@ -12,15 +12,16 @@ class Board:
         self.horizontal_spacing = (self.number_spacing + 1) * (self.base_dim + 1) - 1
 
         self.cells = [Cell(val) for val in init_vals]
-        self.populate_possible_cell_vals()
+        self._populate_possible_cell_vals()
+
+    def _populate_possible_cell_vals(self):
+        for cell in self.cells:
+            if cell.val is None:
+                cell.possible_vals = list(range(1,self.nums_per_line+1))
+        self.update_possible_cell_vals()
 
     def get_cell_vals_list(self):
         return [cell.val for cell in self.cells]
-
-    def populate_possible_cell_vals(self):
-        for cell in self.cells:
-            if len(cell.possible_vals) is 0:
-                cell.possible_vals = list(range(1,self.nums_per_line+1))
 
     def update_possible_cell_vals(self):
         for i in range(len(self.cells)):
@@ -28,11 +29,26 @@ class Board:
             if curr_cell.val is not None:
                 continue
             temp_list = self.get_cell_vals_list()
-            for val in curr_cell.possible_vals:
+            for val in curr_cell.possible_vals[::-1]:
                 temp_list[i] = val
                 if not Board.is_valid_board(temp_list):
                     curr_cell.possible_vals.remove(val)
-        print([c.possible_vals for c in self.cells])
+    
+    def is_win_state(self):
+        current_cell_values = self.get_cell_vals_list()
+        return current_cell_values.count(None) is 0 and \
+            Board.is_valid_board(current_cell_values)
+
+    def is_stalemate(self):
+        self.update_possible_cell_vals()
+        return reduce(
+            lambda a,b: a or b, 
+            [len(cell.possible_vals) == 0 and cell.val is None \
+                for cell in self.cells]
+        ) and not self.is_win_state()
+
+    def make_move(self):
+        return True
 
     # ----- Drawing ----- #
     def draw_board(self):
@@ -57,7 +73,7 @@ class Board:
         return row
     # ----- \Drawing ----- #
 
-    # ----- Static methods ----- #
+    # ----- Static methods ----- # TODO: allow validation for indiv row/col/groups
     @staticmethod
     def is_valid_board(lin_cells):
         len_lin_cells = len(lin_cells)**0.25
