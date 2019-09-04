@@ -14,3 +14,6 @@ def create_sudoku_from_file(filename):
     
 g1 = create_sudoku_from_file('example_3x3.txt')
 g1.draw_board()
+
+g1 = create_sudoku_from_file('example_2x2.txt')
+g1.draw_board()

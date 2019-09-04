@@ -6,11 +6,9 @@ class Board:
     def __init__(self, init_vals, expand=False):
         if not Board.is_valid_board(init_vals):
             raise ValueError
-
         self.nums_per_line = int(math.sqrt(len(init_vals)))
-        self.base_dim = int(self.base_dim)
+        self.base_dim = int(math.sqrt(self.nums_per_line))
         self.cells = [Cell(val) for val in init_vals]
-
         self.number_spacing = 2 if expand else 1
         self.horizontal_spacing = (self.number_spacing + 1) * (self.base_dim + 1) - 1
 
@@ -52,7 +50,7 @@ class Board:
         rows = int(len(lin_cells) ** 0.5)
         for i in range(rows):
             row = lin_cells[i*rows : i*rows+rows]
-            if Board.check_rule_violation(row):
+            if Board._check_rule_violation(row):
                 return False
         return True
 
@@ -61,7 +59,7 @@ class Board:
         cols = int(len(lin_cells) ** 0.5)
         for i in range(cols):
             col = [lin_cells[row*cols + i] for row in range(cols)]
-            if Board.check_rule_violation(col):
+            if Board._check_rule_violation(col):
                 return False
         return True
 
@@ -76,30 +74,14 @@ class Board:
                 for i in range(nums_per_group): # individual group
                     index = (group_row_offset * row) + (group_width * col) + i%group_width + (i//group_width)*nums_per_group
                     group_list.append(lin_cells[index]) 
-                if Board.check_rule_violation(group_list):
+                if Board._check_rule_violation(group_list):
                     return False
         return True
 
     @staticmethod
-    def check_rule_violation(val_list): # no violations are present
+    def _check_rule_violation(val_list): # no violations are present
         track_dict = {val: val_list.count(val) for val in range(1,len(val_list)+1)}
         return reduce(
             lambda a,b: a or b, 
-            [count > 1 for count in track_dict.values()]
+            [count is None or count > 1 for count in track_dict.values()]
         )
-
-Board.check_cols([
-    1,2,4,3,
-    2,1,3,4,
-    3,4,1,2,
-    4,3,2,1])
-Board.check_rows([1,2,3,4,1,2,3,4,1,2,3,4,1,2,3,4])
-print(Board.check_groups([
-    1,2, 1,3,
-    3,4, 2,4,
-
-    3,4, 1,3,
-    1,2, 4,2
-]))
-
-Board.check_rule_violation([1,2,3,4,5])
