@@ -20,9 +20,6 @@ class Board:
                 cell.possible_vals = list(range(1,self.nums_per_line+1))
         self.update_possible_cell_vals()
 
-    def get_cell_vals_list(self):
-        return [cell.val for cell in self.cells]
-
     def update_possible_cell_vals(self):
         for i in range(len(self.cells)):
             curr_cell = self.cells[i]
@@ -33,6 +30,9 @@ class Board:
                 temp_list[i] = val
                 if not Board.is_valid_board(temp_list):
                     curr_cell.possible_vals.remove(val)
+
+    def get_cell_vals_list(self):
+        return [cell.val for cell in self.cells]
     
     def is_win_state(self):
         current_cell_values = self.get_cell_vals_list()
@@ -45,7 +45,7 @@ class Board:
             lambda a,b: a or b, 
             [len(cell.possible_vals) == 0 and cell.val is None \
                 for cell in self.cells]
-        ) and not self.is_win_state()
+        )
 
     def make_move(self):
         return True
