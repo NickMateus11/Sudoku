@@ -1,3 +1,5 @@
+# _pychache_
 *.py[cod]
 
+# Sudoku board files
 *.txt
