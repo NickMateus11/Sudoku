@@ -57,9 +57,7 @@ class Board:
                 self.cells[pop_index].val = None # FIX MUST BE HERE - when stalemate, value is popped and leaves cell with no options
                 # print(self.board_index_stack)
                 # print(len([cell.val for cell in self.cells if cell.val is not None]))
-        current_cell_index = self.find_next_cell_index_with_least_possibilties()
-        if pop_index is not -1:
-            
+        current_cell_index = self.find_next_cell_index_with_least_possibilties()            
             
         self.board_index_stack.append(current_cell_index)
         current_cell = self.cells[current_cell_index]
