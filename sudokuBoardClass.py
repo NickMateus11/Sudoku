@@ -1,6 +1,7 @@
 from cellClass import Cell
 from functools import reduce
 import math
+from copy import deepcopy
 
 class Board:
     def __init__(self, init_vals, expand=False):
@@ -13,12 +14,14 @@ class Board:
 
         self.cells = [Cell(val) for val in init_vals]
         self._populate_possible_cell_vals()
-        self.board_index_stack = []
+        self.cells_state_stack = []
 
     def _populate_possible_cell_vals(self):
         for cell in self.cells:
             if cell.val is None:
                 cell.possible_vals = list(range(1,self.nums_per_line+1))
+            else:
+                cell.possible_vals = [cell.val]
         self.update_possible_cell_vals()
 
     def update_possible_cell_vals(self):
@@ -37,44 +40,47 @@ class Board:
             for val in list(range(1,self.nums_per_line+1)):
                 temp_list[i] = val
                 if Board.is_valid_board(temp_list):
-                    curr_cell.possible_vals.append(val)
+                    curr_cell.possible_vals.append(val) # this is reappening the value that led to stalemate - fix this
 
-        self.possible_cell_vals_list = [cell.possible_vals for cell in self.cells]
+        return [cell.possible_vals for cell in self.cells]
 
     def get_cell_vals_list(self):
         return [cell.val for cell in self.cells]
 
-    def make_move(self):
+    def make_move(self, draw_backtracking=True):
         if self.is_win_state():
             return True
-        start_stack_len = len(self.board_index_stack)
-        pop_index = -1
-        while self.is_stalemate():
-            if len(self.board_index_stack) is 0:
-                return False # This means game is impossible
+        while self.is_stalemate(): #if stuck, restore last fork
+            if len(self.cells_state_stack) > 0:
+                self.cells = self.cells_state_stack.pop() # track the index that was assigned a value
+                print(self.cells)
+                if draw_backtracking:
+                    self.draw_board()
             else:
-                pop_index = self.board_index_stack.pop()
-                self.cells[pop_index].val = None # FIX MUST BE HERE - when stalemate, value is popped and leaves cell with no options
-                # print(self.board_index_stack)
-                # print(len([cell.val for cell in self.cells if cell.val is not None]))
-        current_cell_index = self.find_next_cell_index_with_least_possibilties()            
+                return False
             
-        self.board_index_stack.append(current_cell_index)
-        current_cell = self.cells[current_cell_index]
-        current_cell.set_value(current_cell.possible_vals[0])
+        current_cell = self.cells[self.find_cell_index_with_least_possibilties()]
+        if len(current_cell.possible_vals) > 1: # Fork here
+            fork_val = current_cell.possible_vals.pop(0) # set and remove val as possibility
+            # current_cell.val = None
+            self.cells_state_stack.append(deepcopy(self.cells)) # push board state to stack
+            current_cell.val = fork_val
+        else: # only 1 option (can't be 0)
+            current_cell.val = current_cell.possible_vals[0] # just set val
+        
+
     
-    def find_next_cell_index_with_least_possibilties(self):
-        self.update_possible_cell_vals()
-        index = -1
-        lowest_len = self.nums_per_line
-        for i in range(len(self.possible_cell_vals_list)):
-            p_vals = self.possible_cell_vals_list[i]
-            if i == 34:
-                print(p_vals, len(p_vals), self.cells[i].val)
-            if len(p_vals) < lowest_len and len(p_vals) != 0 and self.cells[i].val is None:
-                lowest_len = len(p_vals)
+    def find_cell_index_with_least_possibilties(self):
+        cell_val_possibilities_list = self.update_possible_cell_vals()
+        smallest_len = self.nums_per_line
+        index = None
+        for i in range(len(cell_val_possibilities_list)):
+            p_vals = cell_val_possibilities_list[i]
+            if len(p_vals) > 0 and len(p_vals) < smallest_len and self.cells[i].val is None:
+                smallest_len = len(p_vals)
                 index = i
         return index
+
 
     # ----- Stop Conditions ----- #
     def is_win_state(self):
@@ -86,7 +92,7 @@ class Board:
         self.update_possible_cell_vals()
         return reduce(
             lambda a,b: a or b, 
-            [len(cell.possible_vals) == 0 and cell.val is None \
+            [len(cell.possible_vals) == 0 \
                 for cell in self.cells]
         )
     # ----- \Stop Conditions ----- #

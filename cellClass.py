@@ -4,10 +4,3 @@ class Cell:
             raise ValueError
         self.val = value
         self.possible_vals = []
-    
-    def set_value(self, val):
-        self.val = val
-        if val in self.possible_vals:
-            self.possible_vals.remove(val)
-        else:
-            raise ValueError
