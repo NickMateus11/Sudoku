@@ -26,8 +26,8 @@ s.draw_board()
 while response is None:
     s.draw_board()
     # print(len([cell.val for cell in s.cells if cell.val is not None]))
-    print(s.possible_cell_vals_list)
+    print(s.possible_cell_vals_list[34])
     response = s.make_move()
 
 s.draw_board()
-print(s.possible_cell_vals_list)
+print(s.possible_cell_vals_list[34])

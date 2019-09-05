@@ -48,15 +48,19 @@ class Board:
         if self.is_win_state():
             return True
         start_stack_len = len(self.board_index_stack)
+        pop_index = -1
         while self.is_stalemate():
             if len(self.board_index_stack) is 0:
                 return False # This means game is impossible
             else:
                 pop_index = self.board_index_stack.pop()
-                self.cells[pop_index].val = None
+                self.cells[pop_index].val = None # FIX MUST BE HERE - when stalemate, value is popped and leaves cell with no options
                 # print(self.board_index_stack)
                 # print(len([cell.val for cell in self.cells if cell.val is not None]))
         current_cell_index = self.find_next_cell_index_with_least_possibilties()
+        if pop_index is not -1:
+            
+            
         self.board_index_stack.append(current_cell_index)
         current_cell = self.cells[current_cell_index]
         current_cell.set_value(current_cell.possible_vals[0])
@@ -68,11 +72,10 @@ class Board:
         for i in range(len(self.possible_cell_vals_list)):
             p_vals = self.possible_cell_vals_list[i]
             if i == 34:
-                print(len(p_vals), self.cells[i].val)
+                print(p_vals, len(p_vals), self.cells[i].val)
             if len(p_vals) < lowest_len and len(p_vals) != 0 and self.cells[i].val is None:
                 lowest_len = len(p_vals)
                 index = i
-        print(index)
         return index
 
     # ----- Stop Conditions ----- #
