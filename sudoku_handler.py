@@ -16,18 +16,17 @@ def solve(board):
     while(Board.is_valid_board(board)):
         return True
 
-sudoku_file = '3x3_hard.txt'
+sudoku_file = 'example_2x2.txt'
+# sudoku_file = '3x3_hard.txt'
 s = create_sudoku_from_file(sudoku_file)
 # print([cell.possible_vals for cell in s.cells])
 # print(s.is_win_state())
 # print(s.is_stalemate())
 response = None
-s.draw_board()
 while response is None:
     s.draw_board()
     # print(len([cell.val for cell in s.cells if cell.val is not None]))
     #print(s.possible_cell_vals_list[34])
     response = s.make_move()
 
-s.draw_board()
 #print(s.possible_cell_vals_list[34])

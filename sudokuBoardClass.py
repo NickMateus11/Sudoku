@@ -55,13 +55,6 @@ class Board:
             if len(self.cells_state_stack) > 0:
                 # TODO: clear blacklist of any cell not part of the current fork tree
 
-                previous_cell_state = self.cells_state_stack.pop() # track the index that was assigned a value
-                for i in range(len(self.cells)):
-                    if i not in self.forked_cells_index_stack: # don't modify the cells in the fork stack
-                        self.cells[i] = previous_cell_state[i]
-                        self.cells[i].black_listed_vals = []
-
-
                 if draw_backtracking:
                     self.draw_board()
             else:
@@ -70,12 +63,7 @@ class Board:
         cell_index = self.cells[self.find_cell_index_with_least_possibilties()]
         current_cell = cell_index
         if len(current_cell.possible_vals) > 1: # Fork here
-            fork_val = current_cell.possible_vals.pop(0) # set and remove val as possibility
-            current_cell.black_listed_vals.append(fork_val) # TODO: local fork blacklisting is required
-            current_cell.val = None # reset cell for when fork is revisited
-            self.cells_state_stack.append(deepcopy(self.cells)) # push cell states to stack
-            self.forked_cells_index_stack.append(cell_index)
-            current_cell.val = fork_val
+            pass
         else: # only 1 option (can't be 0)
             current_cell.val = current_cell.possible_vals[0] # just set val
         # print(self.get_cell_vals_list())
