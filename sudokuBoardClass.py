@@ -40,7 +40,7 @@ class Board:
             curr_cell.possible_vals = []
             for val in list(range(1,self.nums_per_line+1)):
                 temp_list[i] = val
-                if Board.is_valid_board(temp_list) and val not in curr_cell.black_listed_vals:
+                if self.is_val_valid(temp_list, i) and val not in curr_cell.black_listed_vals:
                     curr_cell.possible_vals.append(val) # this is reappending the value that led to stalemate - fix this
 
         return [cell.possible_vals for cell in self.cells]
@@ -54,16 +54,28 @@ class Board:
         while self.is_stalemate(): #if stuck, restore last fork
             if len(self.cells_state_stack) > 0:
                 # TODO: clear blacklist of any cell not part of the current fork tree
+                self.cells = self.cells_state_stack.pop()
 
+                for i in range(len(self.cells)):
+                    prev_cell = self.cells[i]
+                    if i not in self.forked_cells_index_stack:
+                        prev_cell.black_listed_vals = [] # reset blacklisted vals
+                    
+                error_cell_index = self.forked_cells_index_stack.pop()
+                self.cells[error_cell_index].black_listed_vals.append(self.cells[error_cell_index].val)
+                self.cells[error_cell_index].val = None
+                    
                 if draw_backtracking:
                     self.draw_board()
             else:
                 return False      
       
-        cell_index = self.cells[self.find_cell_index_with_least_possibilties()]
-        current_cell = cell_index
+        cell_index = self.find_cell_index_with_least_possibilties()
+        current_cell = self.cells[cell_index]
         if len(current_cell.possible_vals) > 1: # Fork here
-            pass
+            current_cell.val = current_cell.possible_vals[0]
+            self.cells_state_stack.append(deepcopy(self.cells))
+            self.forked_cells_index_stack.append(cell_index)
         else: # only 1 option (can't be 0)
             current_cell.val = current_cell.possible_vals[0] # just set val
         # print(self.get_cell_vals_list())
@@ -119,6 +131,33 @@ class Board:
             row += f'{" "*self.number_spacing}{insert_char}'
         return row
     # ----- \Drawing ----- #
+
+    def is_val_valid(self, lin_cells, index):
+        row = index // self.nums_per_line
+        col = index % self.nums_per_line
+        group = row // self.base_dim + col // self.base_dim
+        print(index, row, col, group)
+
+        row_list = lin_cells[row*self.nums_per_line : (row+1)*self.nums_per_line]
+        # if not self._check_rule_violation(row_list):
+        #     return False
+
+        col_list = [lin_cells[r*self.nums_per_line + col] for r in range(self.nums_per_line)]
+        # if not self._check_rule_violation(col_list):
+        #     return False
+            
+        group_list = []
+        group_row_offset = self.base_dim ** 3
+        for i in range(self.nums_per_line): # individual group
+            _index = (group_row_offset * row//self.base_dim) + \
+                (self.base_dim * col//self.base_dim) + \
+                i%self.base_dim + \
+                (i//self.base_dim)*self.nums_per_line
+            group_list.append(lin_cells[_index]) 
+        print(group_list)
+        return self._check_rule_violation(row_list) and \
+            self._check_rule_violation(col_list) and \
+            self._check_rule_violation(group_list)
 
     # ----- Static methods ----- # TODO: allow validation for indiv row/col/groups
     @staticmethod
