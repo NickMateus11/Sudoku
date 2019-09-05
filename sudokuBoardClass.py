@@ -13,6 +13,7 @@ class Board:
 
         self.cells = [Cell(val) for val in init_vals]
         self._populate_possible_cell_vals()
+        self.board_index_stack = []
 
     def _populate_possible_cell_vals(self):
         for cell in self.cells:
@@ -26,14 +27,55 @@ class Board:
             if curr_cell.val is not None:
                 continue
             temp_list = self.get_cell_vals_list()
-            for val in curr_cell.possible_vals[::-1]:
+
+            # for val in curr_cell.possible_vals[::-1]:
+            #     temp_list[i] = val
+            #     if not Board.is_valid_board(temp_list):
+            #         curr_cell.possible_vals.remove(val)
+
+            curr_cell.possible_vals = []
+            for val in list(range(1,self.nums_per_line+1)):
                 temp_list[i] = val
-                if not Board.is_valid_board(temp_list):
-                    curr_cell.possible_vals.remove(val)
+                if Board.is_valid_board(temp_list):
+                    curr_cell.possible_vals.append(val)
+
+        self.possible_cell_vals_list = [cell.possible_vals for cell in self.cells]
 
     def get_cell_vals_list(self):
         return [cell.val for cell in self.cells]
+
+    def make_move(self):
+        if self.is_win_state():
+            return True
+        start_stack_len = len(self.board_index_stack)
+        while self.is_stalemate():
+            if len(self.board_index_stack) is 0:
+                return False # This means game is impossible
+            else:
+                pop_index = self.board_index_stack.pop()
+                self.cells[pop_index].val = None
+                # print(self.board_index_stack)
+                # print(len([cell.val for cell in self.cells if cell.val is not None]))
+        current_cell_index = self.find_next_cell_index_with_least_possibilties()
+        self.board_index_stack.append(current_cell_index)
+        current_cell = self.cells[current_cell_index]
+        current_cell.set_value(current_cell.possible_vals[0])
     
+    def find_next_cell_index_with_least_possibilties(self):
+        self.update_possible_cell_vals()
+        index = -1
+        lowest_len = self.nums_per_line
+        for i in range(len(self.possible_cell_vals_list)):
+            p_vals = self.possible_cell_vals_list[i]
+            if i == 34:
+                print(len(p_vals), self.cells[i].val)
+            if len(p_vals) < lowest_len and len(p_vals) != 0 and self.cells[i].val is None:
+                lowest_len = len(p_vals)
+                index = i
+        print(index)
+        return index
+
+    # ----- Stop Conditions ----- #
     def is_win_state(self):
         current_cell_values = self.get_cell_vals_list()
         return current_cell_values.count(None) is 0 and \
@@ -46,9 +88,7 @@ class Board:
             [len(cell.possible_vals) == 0 and cell.val is None \
                 for cell in self.cells]
         )
-
-    def make_move(self):
-        return True
+    # ----- \Stop Conditions ----- #
 
     # ----- Drawing ----- #
     def draw_board(self):
