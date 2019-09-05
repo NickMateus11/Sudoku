@@ -15,6 +15,7 @@ class Board:
         self.cells = [Cell(val) for val in init_vals]
         self._populate_possible_cell_vals()
         self.cells_state_stack = []
+        self.forked_cells_index_stack = []
 
     def _populate_possible_cell_vals(self):
         for cell in self.cells:
@@ -39,8 +40,8 @@ class Board:
             curr_cell.possible_vals = []
             for val in list(range(1,self.nums_per_line+1)):
                 temp_list[i] = val
-                if Board.is_valid_board(temp_list):
-                    curr_cell.possible_vals.append(val) # this is reappening the value that led to stalemate - fix this
+                if Board.is_valid_board(temp_list) and val not in curr_cell.black_listed_vals:
+                    curr_cell.possible_vals.append(val) # this is reappending the value that led to stalemate - fix this
 
         return [cell.possible_vals for cell in self.cells]
 
@@ -52,21 +53,32 @@ class Board:
             return True
         while self.is_stalemate(): #if stuck, restore last fork
             if len(self.cells_state_stack) > 0:
-                self.cells = self.cells_state_stack.pop() # track the index that was assigned a value
-                print(self.cells)
+                # TODO: clear blacklist of any cell not part of the current fork tree
+
+                previous_cell_state = self.cells_state_stack.pop() # track the index that was assigned a value
+                for i in range(len(self.cells)):
+                    if i not in self.forked_cells_index_stack: # don't modify the cells in the fork stack
+                        self.cells[i] = previous_cell_state[i]
+                        self.cells[i].black_listed_vals = []
+
+
                 if draw_backtracking:
                     self.draw_board()
             else:
-                return False
-            
-        current_cell = self.cells[self.find_cell_index_with_least_possibilties()]
+                return False      
+      
+        cell_index = self.cells[self.find_cell_index_with_least_possibilties()]
+        current_cell = cell_index
         if len(current_cell.possible_vals) > 1: # Fork here
             fork_val = current_cell.possible_vals.pop(0) # set and remove val as possibility
-            # current_cell.val = None
-            self.cells_state_stack.append(deepcopy(self.cells)) # push board state to stack
+            current_cell.black_listed_vals.append(fork_val) # TODO: local fork blacklisting is required
+            current_cell.val = None # reset cell for when fork is revisited
+            self.cells_state_stack.append(deepcopy(self.cells)) # push cell states to stack
+            self.forked_cells_index_stack.append(cell_index)
             current_cell.val = fork_val
         else: # only 1 option (can't be 0)
             current_cell.val = current_cell.possible_vals[0] # just set val
+        # print(self.get_cell_vals_list())
         
 
     
@@ -76,7 +88,7 @@ class Board:
         index = None
         for i in range(len(cell_val_possibilities_list)):
             p_vals = cell_val_possibilities_list[i]
-            if len(p_vals) > 0 and len(p_vals) < smallest_len and self.cells[i].val is None:
+            if len(p_vals) > 0 and len(p_vals) < smallest_len and not self.cells[i].val:
                 smallest_len = len(p_vals)
                 index = i
         return index
