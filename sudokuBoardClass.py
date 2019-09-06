@@ -32,11 +32,6 @@ class Board:
                 continue
             temp_list = self.get_cell_vals_list()
 
-            # for val in curr_cell.possible_vals[::-1]:
-            #     temp_list[i] = val
-            #     if not Board.is_valid_board(temp_list):
-            #         curr_cell.possible_vals.remove(val)
-
             curr_cell.possible_vals = []
             for val in list(range(1,self.nums_per_line+1)):
                 temp_list[i] = val
@@ -53,9 +48,7 @@ class Board:
             return True
         while self.is_stalemate(): #if stuck, restore last fork
             if len(self.cells_state_stack) > 0:
-                # TODO: clear blacklist of any cell not part of the current fork tree
                 self.cells = self.cells_state_stack.pop()
-
                 for i in range(len(self.cells)):
                     prev_cell = self.cells[i]
                     if i not in self.forked_cells_index_stack:
@@ -78,9 +71,6 @@ class Board:
             self.forked_cells_index_stack.append(cell_index)
         else: # only 1 option (can't be 0)
             current_cell.val = current_cell.possible_vals[0] # just set val
-        # print(self.get_cell_vals_list())
-        
-
     
     def find_cell_index_with_least_possibilties(self):
         cell_val_possibilities_list = self.update_possible_cell_vals()
@@ -93,7 +83,6 @@ class Board:
                 index = i
         return index
 
-
     # ----- Stop Conditions ----- #
     def is_win_state(self):
         current_cell_values = self.get_cell_vals_list()
@@ -102,6 +91,7 @@ class Board:
 
     def is_stalemate(self):
         self.update_possible_cell_vals()
+        
         return reduce(
             lambda a,b: a or b, 
             [len(cell.possible_vals) == 0 \
@@ -135,29 +125,29 @@ class Board:
     def is_val_valid(self, lin_cells, index):
         row = index // self.nums_per_line
         col = index % self.nums_per_line
-        group = row // self.base_dim + col // self.base_dim
-        print(index, row, col, group)
+        # group = row // self.base_dim + col // self.base_dim
+        # print(index, row, col, group)
 
         row_list = lin_cells[row*self.nums_per_line : (row+1)*self.nums_per_line]
-        # if not self._check_rule_violation(row_list):
-        #     return False
+        if self._check_rule_violation(row_list):
+            return False
 
         col_list = [lin_cells[r*self.nums_per_line + col] for r in range(self.nums_per_line)]
-        # if not self._check_rule_violation(col_list):
-        #     return False
+        if self._check_rule_violation(col_list):
+            return False
             
         group_list = []
         group_row_offset = self.base_dim ** 3
         for i in range(self.nums_per_line): # individual group
-            _index = (group_row_offset * row//self.base_dim) + \
-                (self.base_dim * col//self.base_dim) + \
+            ind = (group_row_offset * (row//self.base_dim)) + \
+                (self.base_dim * (col//self.base_dim)) + \
                 i%self.base_dim + \
                 (i//self.base_dim)*self.nums_per_line
-            group_list.append(lin_cells[_index]) 
-        print(group_list)
-        return self._check_rule_violation(row_list) and \
-            self._check_rule_violation(col_list) and \
-            self._check_rule_violation(group_list)
+            group_list.append(lin_cells[ind]) 
+        if self._check_rule_violation(group_list):
+            return False
+
+        return True
 
     # ----- Static methods ----- # TODO: allow validation for indiv row/col/groups
     @staticmethod
@@ -192,12 +182,15 @@ class Board:
         nums_per_group = int(len(lin_cells) ** 0.5)
         group_width = int(nums_per_group ** 0.5)
         group_row_offset = group_width ** 3
-        for row in range(group_width): # row of groups
-            for col in range(group_width): # each group per row
+        for group_row in range(group_width): # row of groups
+            for group_col in range(group_width): # each group per row
                 group_list = []
                 for i in range(nums_per_group): # individual group
-                    index = (group_row_offset * row) + (group_width * col) + i%group_width + (i//group_width)*nums_per_group
-                    group_list.append(lin_cells[index]) 
+                    index = (group_row_offset * group_row) + \
+                        (group_width * group_col) + \
+                        i%group_width + \
+                        (i//group_width)*nums_per_group
+                    group_list.append(index) 
                 if Board._check_rule_violation(group_list):
                     return False
         return True

@@ -9,7 +9,7 @@ def create_sudoku_from_file(filename):
     linearized_list = []
     for i in range(len(contents)):
         stripped_line = contents[i].strip().replace(' ', '')
-        linearized_list += [(int(val) if val is not '*' else None) for val in stripped_line]
+        linearized_list += [(int(val) if (val is not '*' and val is not '0') else None) for val in stripped_line]
     return Board(linearized_list)
     
 def solve(board):
@@ -17,19 +17,22 @@ def solve(board):
         return True
 
 # sudoku_file = 'example_2x2.txt'
-sudoku_file = '3x3_hard.txt'
+# sudoku_file = '3x3_hard.txt'
+# sudoku_file = 'example_3x3.txt'
+sudoku_file = 'expert.txt'
 s = create_sudoku_from_file(sudoku_file)
 # print([cell.possible_vals for cell in s.cells])
 # print(s.is_win_state())
 # print(s.is_stalemate())
 response = None
 moves = 0
+s.draw_board()
 while response is None:
-    s.draw_board()
+    #s.draw_board()
     # print(len([cell.val for cell in s.cells if cell.val is not None]))
     #print(s.possible_cell_vals_list[34])
     response = s.make_move()
     moves+=1
-
+s.draw_board()
 #print(s.possible_cell_vals_list[34])
-print(moves)
+print(moves-1)
