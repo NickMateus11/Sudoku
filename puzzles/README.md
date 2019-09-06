@@ -1,0 +1,1 @@
+Folder to place all .txt files that represent initial sudoku boards

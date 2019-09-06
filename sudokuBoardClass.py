@@ -2,6 +2,7 @@ from cellClass import Cell
 from functools import reduce
 import math
 from copy import deepcopy
+import random
 
 class Board:
     def __init__(self, init_vals, expand=False):
@@ -43,7 +44,7 @@ class Board:
     def get_cell_vals_list(self):
         return [cell.val for cell in self.cells]
 
-    def make_move(self, draw_backtracking=True):
+    def make_move(self, draw_backtracking=True): # Targets cells with least number of possible vals, uses backtracking
         if self.is_win_state():
             return True
         while self.is_stalemate(): #if stuck, restore last fork
@@ -66,7 +67,9 @@ class Board:
         cell_index = self.find_cell_index_with_least_possibilties()
         current_cell = self.cells[cell_index]
         if len(current_cell.possible_vals) > 1: # Fork here
-            current_cell.val = current_cell.possible_vals[0]
+            # random_available_val = random.randrange(len(current_cell.possible_vals)) # Enables good AVERAGE moves solving
+            random_available_val = 0
+            current_cell.val = current_cell.possible_vals[random_available_val]
             self.cells_state_stack.append(deepcopy(self.cells))
             self.forked_cells_index_stack.append(cell_index)
         else: # only 1 option (can't be 0)

@@ -17,7 +17,7 @@ def solve(board):
         return True
 
 folder = 'puzzles/'
-sudoku_file = 'example_3x3.txt'
+sudoku_file = 'wiki.txt'
 
 s = create_sudoku_from_file(folder+sudoku_file)
 
