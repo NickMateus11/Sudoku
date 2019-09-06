@@ -67,9 +67,9 @@ class Board:
         cell_index = self.find_cell_index_with_least_possibilties()
         current_cell = self.cells[cell_index]
         if len(current_cell.possible_vals) > 1: # Fork here
-            # random_available_val = random.randrange(len(current_cell.possible_vals)) # Enables good AVERAGE moves solving
-            random_available_val = 0
-            current_cell.val = current_cell.possible_vals[random_available_val]
+            # random_available_val_index = random.randrange(len(current_cell.possible_vals)) # Enables good AVERAGE moves solving
+            random_available_val_index = 0
+            current_cell.val = current_cell.possible_vals[random_available_val_index]
             self.cells_state_stack.append(deepcopy(self.cells))
             self.forked_cells_index_stack.append(cell_index)
         else: # only 1 option (can't be 0)
